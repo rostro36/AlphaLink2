@@ -31,7 +31,7 @@ def make_mmseqs(fasta_path, output_dir_base, use_templates):
     # Validate the input.
     result_dir = Path(output_dir_base)
     output_dir = os.path.join(output_dir_base, target_id)
-
+    output_dir = output_dir_base
     sequences, is_multimer, _ = validate_input(
         input_sequences=input_sequences,
         symmetry_group='C1',
@@ -70,10 +70,10 @@ def make_mmseqs(fasta_path, output_dir_base, use_templates):
         use_templates=use_templates,
         homooligomers_num = homooligomers_num
     )
-    _, homomers = chain_mapping.items()
+    #_, homomers = chain_mapping.items()
     for idx, seq in enumerate(sequences):
         chain_id = PDB_CHAIN_IDS[idx]
-        head = homomers[idx][0] if len(sequences)>0 else chain_id
+        head = chain_id
         sequence_features = make_sequence_features(
                 sequence=seq, description=f'> {jobname} seq {chain_id}', num_res=len(seq)
             )
@@ -83,9 +83,11 @@ def make_mmseqs(fasta_path, output_dir_base, use_templates):
         feature_dict = {**sequence_features, **msa_features, **template_features}
         feature_dict = compress_features(feature_dict)
         os.makedirs(output_dir, exist_ok=True)
+        output_dir = Path(output_dir)
         features_output_path = output_dir/f"{chain_id}.feature.pkl.gz"
         features_h_path = output_dir/f"{head}.feature.pkl.gz"
-        shutil.copy(features_output_path, features_h_path)
+        pickle.dump(feature_dict,gzip.GzipFile(features_output_path, "wb"),protocol=4)
+        #shutil.copy(features_output_path, features_h_path)
         
         pickle.dump(
             feature_dict,
@@ -103,7 +105,7 @@ def make_mmseqs(fasta_path, output_dir_base, use_templates):
                 gzip.GzipFile(uniprot_output_path, "wb"),
                 protocol=4,
             )
-            shutil.copy(uniprot_output_path, uniprot_h_path)
+            #shutil.copy(uniprot_output_path, uniprot_h_path)
 
 def parse_args():
     parser = argparse.ArgumentParser(

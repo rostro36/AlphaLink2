@@ -35,14 +35,14 @@ def create_dummy_file(file_path):
 
 def get_empty_templates(query_sequence, parent_path):
     create_dummy_file(parent_path)
-    pdb_template_hits = HhsearchHitFeaturizer(parent_path, "1900-01-01",0,None).get_templates(query_sequence, [])
+    pdb_template_hits = HhsearchHitFeaturizer(parent_path, "1900-01-01",0,None,None,None).get_templates(query_sequence, [])
     return pdb_template_hits
 
 #like pipeline
 def prepare_msa(msa_path):
     result = run_msa_tool(None, None, msa_path, "a3m", True)
     parsed = parsers.parse_a3m(result["a3m"])
-    msa_features = make_msa_features((parsed))
+    msa_features = make_msa_features([parsed])
     return msa_features
 
 
@@ -60,46 +60,47 @@ def write_separate_a3m(msa, msa_path:Path):
 
 def process_precomputed(a3m_path:Path, parent_path:Path):
     first_sequences, msas = read_a3m_file(a3m_path)
+    #TODO prepare a3m with deletion of inserts? and adding of gaps if needed?
     make_chains_txt(parent_path, first_sequences)
     #msas = msas as description\nseq\n
     chain_ids = "ABCDEFGHIJKLMNOPQRSTUVXYZ"[:len(first_sequences)]
     descriptions = [f"seq_{it}" for it, _ in enumerate(first_sequences)]
-    _, _, mapping = get_chain_id_map(first_sequences, descriptions)
-    chain_ids, homomers = mapping.items()
-    for sequence, msa, chain_id, homomers in zip(first_sequences, msas, chain_ids, chain_ids, homomers):
-        msa_path = parent_path/f"{sequence}_single.a3m"
-        head = homomers[0] if len(homomers)>0 else chain_id
+    #_, _, mapping = get_chain_id_map(first_sequences, descriptions)
+    for sequence, msa, chain_id in zip(first_sequences, msas, chain_ids):
+        msa_path = parent_path/f"{sequence[:10]}_single.a3m"
+        #head = homomers[0] if len(homomers)>0 else chain_id
+        msa = "".join(msa)
         write_separate_a3m(msa, msa_path)
         # how to concat msa_features?
         msa_features = prepare_msa(msa_path)
         sequence_features = make_sequence_features(sequence=sequence, description="first", num_res=len(sequence))
         templates_results = get_empty_templates(sequence, parent_path)
-        feature_dict = {**sequence_features, **msa_features, **templates_results}
+        feature_dict = {**sequence_features, **msa_features, **templates_results.features}
         feature_dict = compress_features(feature_dict)
         os.makedirs(parent_path, exist_ok=True)
 
         features_output_path = parent_path/f"{chain_id}.feature.pkl.gz"
-        features_h_path = parent_path/f"{head}.feature.pkl.gz"
+        #features_h_path = parent_path/f"{head}.feature.pkl.gz"
 
         pickle.dump(
             feature_dict,
             gzip.GzipFile(features_output_path, "wb"),
             protocol=4
             )
-        shutil.copy(features_output_path, features_h_path)
+        #shutil.copy(features_output_path, features_h_path)
 
         if len(first_sequences)>1:
             multimer_msa = parsers.parse_a3m(msa)
             pair_features = make_msa_features([multimer_msa])
             pair_feature_dict = compress_features(pair_features)
             uniprot_output_path = parent_path/f"{chain_id}.uniprot.pkl.gz"
-            uniprot_h_path = parent_path/f"{head}.uniprot.pkl.gz"
+            #uniprot_h_path = parent_path/f"{head}.uniprot.pkl.gz"
             pickle.dump(
                 pair_feature_dict,
                 gzip.GzipFile(uniprot_output_path, "wb"),
                 protocol=4,
             )
-            shutil.copy(uniprot_output_path, uniprot_h_path)
+            #shutil.copy(uniprot_output_path, uniprot_h_path)
     #return {**sequence_features, **msa_features, **templates_results.features}
 
 
@@ -130,6 +131,6 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    fasta_path = Path(args.fasta_path)
+    input_path = Path(args.input_path)
     output_dir = Path(args.output_dir)
-    process_precomputed(fasta_path, output_dir)
+    process_precomputed(input_path, output_dir)

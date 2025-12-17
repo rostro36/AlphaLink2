@@ -206,7 +206,7 @@ prepare_precomputed_msa() {
     
     local cmd=(
         python scripts/prepare_precomputed.py
-        --a3m_path="$fasta_path"
+        --input_path="$fasta_path"
         --output_dir="$output_dir_base"
     )
     
@@ -255,6 +255,11 @@ run_prediction() {
         echo "Continuing without crosslink constraints..."
         local crosslinks_arg=""
     else
+        if [[ "$crosslinks" == *.csv ]]; then
+            python generate_crosslink_pickle.py \
+            --csv "$crosslinks" \
+            --output "${crosslinks%.csv}.pkl.gz"
+        fi
         local crosslinks_arg="--crosslinks=$crosslinks"
     fi
     

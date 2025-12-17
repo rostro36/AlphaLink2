@@ -135,7 +135,7 @@ We expose also 4 optional parameters to set the number of recycling iterations, 
 ```bash
     bash run_alphalink.sh \
     /path/to/the/input.fasta \        # target fasta file
-    /path/to/crosslinks.pkl.gz \      # pickled and gzipped dictionary with crosslinks
+    /path/to/crosslinks.csv \         # file with crosslinks
     /path/to/the/output/directory/ \  # output directory
     /path/to/model_parameters.pt \    # model parameters
     /path/to/database/directory/ \    # directory of databases
@@ -145,7 +145,57 @@ We expose also 4 optional parameters to set the number of recycling iterations, 
     30 \                              # downsample MSAs to Neff 30 (default: -1, use full MSA, expects integer >= 1)
     1                                 # integer > 0 activates this option. Remove MSA information for crosslinked residues (default: -1, use full MSA)
 ```
+### Support for precomputed MSAs
+There also is the option to use precomputed MSAs in a3m format (with # header for multimers), please be aware that an aligned MSA is expected and insertions are ignored.
 
+```bash
+    bash run_alphalink.sh \
+    /path/to/the/input.a3m \          # target a3m file
+    /path/to/crosslinks.csv \         # file with crosslinks
+    /path/to/the/output/directory/ \  # output directory
+    /path/to/model_parameters.pt \    # model parameters
+    /path/to/database/directory/ \    # directory of databases
+    2020-05-01 \                      # use templates before this date
+    20 \                              # use 20 recycling iterations (default: 20)
+    25 \                              # generate 25 sample (default: 25)
+    30 \                              # downsample MSAs to Neff 30 (default: -1, use full MSA, expects integer >= 1)
+    1 \                               # integer > 0 activates this option. Remove MSA information for crosslinked residues (default: -1, use full MSA)
+    precomputed                       # Operation mode ("mmseqs", "precomputed", "default")
+```
+### Support for MMseqs2 web server
+The last option allows to use the [MMseqs2](https://github.com/soedinglab/MMseqs2) web server that is also employed by [ColabFold](https://github.com/sokrypton/ColabFold/) and does not need the download of sequence databases or installation of search tools. 
+
+```bash
+    bash run_alphalink.sh \
+    /path/to/the/input.fasta \        # target fasta file
+    /path/to/crosslinks.csv \         # file with crosslinks
+    /path/to/the/output/directory/ \  # output directory
+    /path/to/model_parameters.pt \    # model parameters
+    /path/to/database/directory/ \    # directory of databases
+    2020-05-01 \                      # use templates before this date
+    20 \                              # use 20 recycling iterations (default: 20)
+    25 \                              # generate 25 sample (default: 25)
+    30 \                              # downsample MSAs to Neff 30 (default: -1, use full MSA, expects integer >= 1)
+    1 \                               # integer > 0 activates this option. Remove MSA information for crosslinked residues (default: -1, use full MSA)
+    mmseqs                            # Operation mode ("mmseqs", "precomputed", "default")
+```
+### Support for MMseqs2 web server
+The last option allows to use the [MMseqs2](https://github.com/soedinglab/MMseqs2) web server that is also employed by [ColabFold](https://github.com/sokrypton/ColabFold/) and does not need the download of sequence databases or installation of search tools. 
+
+```bash
+    bash run_alphalink.sh \
+    /path/to/the/input.fasta \        # target fasta file
+    /path/to/crosslinks.csv \         # file with crosslinks
+    /path/to/the/output/directory/ \  # output directory
+    /path/to/model_parameters.pt \    # model parameters
+    /path/to/database/directory/ \    # directory of databases
+    2020-05-01 \                      # use templates before this date
+    20 \                              # use 20 recycling iterations (default: 20)
+    25 \                              # generate 25 sample (default: 25)
+    30 \                              # downsample MSAs to Neff 30 (default: -1, use full MSA, expects integer >= 1)
+    1 \                               # integer > 0 activates this option. Remove MSA information for crosslinked residues (default: -1, use full MSA)
+    mmseqs                            # Operation mode ("mmseqs", "precomputed", "default")
+```
 
 ## AlphaLink IHM model deposition
 
