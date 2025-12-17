@@ -171,7 +171,7 @@ The last option allows to use the [MMseqs2](https://github.com/soedinglab/MMseqs
     /path/to/crosslinks.csv \         # file with crosslinks
     /path/to/the/output/directory/ \  # output directory
     /path/to/model_parameters.pt \    # model parameters
-    /path/to/database/directory/ \    # directory of databases
+    None \                            # directory of databases
     2020-05-01 \                      # use templates before this date
     20 \                              # use 20 recycling iterations (default: 20)
     25 \                              # generate 25 sample (default: 25)
@@ -188,7 +188,7 @@ The last option allows to use the [MMseqs2](https://github.com/soedinglab/MMseqs
     /path/to/crosslinks.csv \         # file with crosslinks
     /path/to/the/output/directory/ \  # output directory
     /path/to/model_parameters.pt \    # model parameters
-    /path/to/database/directory/ \    # directory of databases
+    None \                            # directory of databases
     2020-05-01 \                      # use templates before this date
     20 \                              # use 20 recycling iterations (default: 20)
     25 \                              # generate 25 sample (default: 25)
